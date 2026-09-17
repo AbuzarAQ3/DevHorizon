@@ -2,62 +2,95 @@
 
 {% block content %}
 
-    <!-- highlighted featured post -->
-    {% for post in featured_posts %}
-    {% if forloop.first %}
-    <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark"
-      style="background-image: url({{ post.featured_image.url }});background-blend-mode: overlay;background-size:cover;">
-      <div class="col-md-8 px-0">
-        <h1 class="display-4 font-italic"> {{ post.title }}</h1>
-        <p class="lead my-3"> {{ post.short_description }} </p>
-        <p class="lead mb-0"><a href="#" class="text-white font-weight-bold">Continue reading...</a></p>
-      </div>
-    </div>
-    {% endif %}
-    {% endfor %}
+<!-- Page content-->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Post content-->
+            <article>
+                <!-- Post header-->
+                <header class="mb-4">
+                    <!-- Post title-->
+                    <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
+                    <!-- Post meta content-->
+                    <div class="text-muted fst-italic mb-2">Posted on {{ blog.created_at }} by {{ blog.author }}</div>
+                    <!-- Post category-->
+                    <a class="badge bg-warning text-decoration-none text-light" href="#!">{{ blog.category }}</a>
+                </header>
+                <!-- Preview image figure-->
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{ blog.featured_image.url }}" alt="..." /></figure>
+                <!-- Post content-->
+                <section class="mb-5">
+                    <p class="fs-5 mb-4">{{ blog.short_description }}</p>
+                    <p class="fs-5 mb-4">{{ blog.blog_body }}</p>
 
-    <!-- all featured posts section excluding highlight -->
-    <h3 class="text-uppercase text-warning" style="letter-spacing: 2px">
-      Featured Posts
-    </h3>
-    <div class="row mb-2">
-      {% for post in featured_posts %}
-      {% if not forloop.first %}
-      <div class="col-md-6">
-        <div class="card border-0">
-          <div class="card-body">
-            <h3> {{ post.title }}</h3>
-            <small class="mb-1 text-muted">{{ post.created_at | timesince }} ago | {{ post.author }}</small>
-            <p class="card-text"> {{ post.short_description | truncatewords:25 }} </p>
-          </div>
+                    <!-- Comments -->
+                    <h4>Comments ({{ comment_count }})</h4>
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="card mt-1">
+                                <div class="card-body">
+                                    <p class="card-text mb-0">{{ comment }}</p>
+                                    <span>
+                                        <small>By {{ comment.user }}</small>
+                                        <small>| {{ comment.created_at | timesince }} ago</small>
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                    No comments yet.
+                    {% endif %}
+                    <br>
+                    <div class="form-group">
+                        {% if user.is_authenticated %}
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea name="comment" class="form-control" placeholder="Write your comment"></textarea>
+                                <input type="submit" value="Submit" class="btn btn-primary mt-2">
+                            </div>
+
+                        </form>
+                        {% else %}
+                        <p>Please <span><a href="{% url 'login' %}">login</a></span> to write a comment!</p>
+                        {% endif %}
+                    </div>
+
+                </section>
+            </article>
         </div>
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
-<!-- all recent posts -->
-    <main role="main" class="container p-0">
-      <div class="row">
-        <div class="col-md-8 blog-main">
-
-          <div class="blog-post">
-            <h2 class="text-uppercase text-warning" style="letter-spacing: 2px">
-              Recent Posts
-            </h2>
-            {% for post in posts %}
-            <div class="card border-0">
-              <div class="card-body">
-                <h3> {{ post.title }}</h3>
-                <small class="mb-1 text-muted">{{ post.created_at | timesince }} ago | {{ post.author }}</small>
-                <p class="card-text"> {{ post.short_description | truncatewords:25 }}</p>
-              </div>
+        <!-- Side widgets-->
+        <div class="col-lg-4">
+            
+            <!-- Categories widget-->
+            <div class="card mb-4 p-3">
+                <h4 class="font-italic">Categories</h4>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                {% for category in categories %}
+                                <li><a href="{% url 'posts_by_category' category.id %}">{{ category.category_name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endfor %}
-          </div>
-          <!-- /.blog-post -->
-
+            <!-- Side widget-->
+            {% if social_links %}
+            <div class="card mb-4 p-3">
+                <h4 class="font-italic">Follow Us</h4>
+                <ol class="list-unstyled">
+                    {% for i in social_links %}
+                    <li><a href="{{ i.link }}" target="_blank">{{ i.platform }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %}
         </div>
-        <!-- /.blog-main -->
-
+    </div>
+</div>
 
 {% endblock %}
