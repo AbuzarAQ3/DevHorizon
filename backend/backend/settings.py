@@ -45,8 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # third party apps
+    'crispy_forms',
+    'crispy_bootstrap4',
+    
     # apps
     'blog',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +150,9 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+# crispy_forms stufff:
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
