@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Category, Blog, Author
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from .models import Category, Blog, Comment
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 
 def homepage(request):
@@ -8,7 +9,7 @@ def homepage(request):
     posts = Blog.objects.filter(is_featured=False, status='Published')
     
     try:
-        author = Author.objects.get()
+        author = User.objects.get()
     # hard lesson, try does not work with all() or filter()
     except:
         author = None
@@ -20,14 +21,25 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 def blogs(request, slug):
-    blog = get_object_or_404(Blog, slug=slug, status='Published')
+    post = get_object_or_404(Blog, slug=slug, status='Published')
+    if request.method == 'POST':
+        comment = Comment()
+        comment.user = request.user
+        comment.post = post
+        comment.comment_body = request.POST['comment_body']
+        comment.save()
+        return HttpResponseRedirect(request.path_info)
+    comments = Comment.objects.filter(post=post)
+    comments_count = comments.count()
     context = {
-        'blog':blog,
+        'blog':post,
+        'comments': comments,
+        'comments_count': comments_count,
     }
     return render(request, 'blogs.html', context)
 
 def blogs_search(request):
-    keyword = request.GET.get('keyword')
+    keyword = request.GET.get('keyword', '')
     blogs = Blog.objects.filter(Q(title__icontains=keyword) | Q(short_description__icontains=keyword) | Q(blog_body=keyword), status='Published')
     context = {
         'blogs': blogs,
