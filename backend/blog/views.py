@@ -8,15 +8,9 @@ def homepage(request):
     featured_posts = Blog.objects.filter(is_featured=True, status='Published').order_by('updated_at')
     posts = Blog.objects.filter(is_featured=False, status='Published')
     
-    try:
-        author = User.objects.get()
-    # hard lesson, try does not work with all() or filter()
-    except:
-        author = None
     context = {
         'featured_posts': featured_posts,
         'posts': posts,
-        'author': author,
     }
     return render(request, 'homepage.html', context)
 

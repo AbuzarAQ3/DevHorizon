@@ -62,7 +62,7 @@ def add_post(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user.author
+            post.author = request.user
             post.save()
             post.slug = slugify(form.cleaned_data['title']) + '-' + str(post.id)
             # future update, to transfer slug generations inside models as it is the prod standard

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="blog-post">
+  <h2 class="text-dark" style="letter-spacing: 2px">
+    Found <i>{{ keyword }}</i> Posts
+  </h2>
+  {% if blogs %}
+  {% for blog in blogs %}
+  <div class="card border-0">
+    <div class="card-body">
+      <h3> <a href="{% url 'blogs' blog.slug %}" class="text-dark font-weight-bold">{{ blog.title }}</a></h3>
+      <small class="mb-1 text-muted">{{ blog.created_at | timesince }} ago | {{ blog.author }}</small>
+      <p class="card-text"> {{ blog.short_description | truncatewords:25 }}</p>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="card border-0">
+    <div class="card-body">
+      <h3 class="text-dark font-weight-bold">No Posts Available</h3>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
